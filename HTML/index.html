@@ -1,0 +1,238 @@
+    <meta http-equiv      ="Content-Type" content="text/html; charset=utf-8">
+    <script src="/socket.io/socket.io.js"></script>
+    <link rel="stylesheet" type="text/css" href="/script/index.css">
+
+    <script>
+        var socket = io('http://127.0.0.1:8181');
+    //________________________________________________________________ alerte
+    socket.on('alerte', function (alerte, statut) {
+       alert(alerte);
+       document.getElementById('loader').style.display = 'none';
+       if (statut != '') {
+           document.getElementById('statut').innerHTML = statut;
+       };
+   });
+    //________________________________________________________________ upSMS
+    socket.on('upSMS', function () {
+       document.getElementById('receiver').value = '';
+       document.getElementById('text').value = '';
+
+   });
+
+
+    //________________________________________________________________ upUser
+    function upUser() {
+        var user = document.getElementById('user').value;
+        var pw = document.getElementById('pw').value;
+        var mailSMS = document.getElementById('mailSMS').value;
+        var mailAR = document.getElementById('mailAR').checked;
+        var textOQP = document.getElementById('textOQP').value;
+        var occuper = document.getElementById('occuper').checked;
+
+        socket.emit('upUser',user, pw, mailSMS, mailAR, textOQP, occuper);
+    }
+    socket.on('upUser', function (user, pw, mailSMS, mailAR, textOQP, occuper) {
+       document.getElementById('loader').style.display = 'none';
+       document.getElementById('user').value = user;
+       document.getElementById('pw').value = pw;
+       document.getElementById('mailSMS').value = mailSMS;
+       document.getElementById('mailAR').checked = mailAR;
+       document.getElementById('textOQP').value = textOQP;
+       document.getElementById('occuper').checked = occuper;
+   });
+    //________________________________________________________________ upModem
+
+    function upModem() {
+       socket.emit('upModem');
+   }
+   socket.on('upModem', function (deviceOb, device, sender, pop3, smtp, mailUser, mailPw) {
+       document.getElementById('loader').style.display = 'none';
+       for (var i = 0; i < deviceOb.length; i++) {
+           if (deviceOb[i] != "") {
+               var option = document.createElement("option");
+               option.value = deviceOb[i];
+               option.text = deviceOb[i];
+               if (deviceOb[i] == device) {
+                   option.selected = true;
+               };
+               document.getElementById('device').appendChild(option);
+           };
+       }
+       document.getElementById('sender').value = sender;
+       document.getElementById('pop3').value=pop3;
+       document.getElementById('smtp').value=smtp;
+       document.getElementById('mailUser').value=mailUser;
+       document.getElementById('mailPw').value=mailPw;
+   });
+    //________________________________________________________________ Session 
+
+    function Session(code) {
+       document.getElementById('loader').style.display = 'block';
+       socket.emit('Session', code);
+   }
+    //________________________________________________________________ selectModem 
+
+    function selectModem() {
+       document.getElementById('loader').style.display = 'block';
+       socket.emit('selectModem', document.getElementById('device').value);
+   }
+   socket.on('selectModem', function (sender, pop3, smtp, mailUser, mailPw) {
+    document.getElementById('loader').style.display = 'none';
+    document.getElementById('sender').value=sender;
+    document.getElementById('pop3').value=pop3;
+    document.getElementById('smtp').value=smtp;
+    document.getElementById('mailUser').value=mailUser;
+    document.getElementById('mailPw').value=mailPw;
+});
+
+    //________________________________________________________________ paramSMS
+
+    function paramSMS() {
+       document.getElementById('loader').style.display = 'block';
+       socket.emit('paramSMS', 
+        document.getElementById('device').value,
+        document.getElementById('sender').value,
+        document.getElementById('pop3').value,
+        document.getElementById('smtp').value,
+        document.getElementById('mailUser').value,
+        document.getElementById('mailPw').value);
+   }
+   socket.on('paramSMS', function (statut) {
+       document.getElementById('loader').style.display = 'none';
+       document.getElementById('statut').innerHTML = statut;
+   });
+    //________________________________________________________________ scriptSMS
+
+    function supScriptSMS(){
+        socket.emit('supScriptSMS', 
+        document.getElementById('motClef').value);
+    }
+
+    function scriptSMS() {
+       document.getElementById('loader').style.display = 'block';
+       socket.emit('scriptSMS', 
+        document.getElementById('motClef').value, 
+        document.getElementById('script').value);
+   }
+   socket.on('scriptSMS', function (motClef,script) {
+       document.getElementById('loader').style.display = 'none';
+       document.getElementById('motClef').value = motClef;
+       document.getElementById('script').value = script;
+   });
+
+    //________________________________________________________________ popScript
+
+    function popScript() {
+       document.getElementById('loader').style.display = 'block';
+       socket.emit('popScript', document.getElementById('popScript').value);
+   }
+   socket.on('popScript', function (popScript, motClef, script) {
+    document.getElementById('loader').style.display = 'none';
+    var x = document.getElementById("popScript");
+    while (x.options.length > 0) {
+        x.remove(0);
+    }
+  for (var i = 0; i < popScript.length; i++) {
+   if (popScript[i] != "") {
+       var option = document.createElement("option");
+       var subMotClef = popScript[i].substring(0, popScript[i].length -3);;
+       option.value = subMotClef;
+       option.text = subMotClef;
+       if (subMotClef == motClef) {
+           option.selected = true;
+       };
+       document.getElementById('popScript').appendChild(option);
+   };
+}
+document.getElementById('motClef').value=motClef;
+document.getElementById('script').value=script;
+});
+
+    //________________________________________________________________ sendSMS
+
+    function sendSMS() {
+       document.getElementById('loader').style.display = 'block';
+       socket.emit('sndSMS', 
+        document.getElementById('device').value, 
+        document.getElementById('sender').value, 
+        document.getElementById('receiver').value, 
+        document.getElementById('text').value, 
+        document.getElementById('user').value);
+   }
+   socket.on('sendSMS', function (user, sender, receiver, text, statut, date) {
+       document.getElementById('loader').style.display = 'none';
+       var table = document.getElementById('histoSND');
+       var row = table.insertRow(1);
+       smsOb = [user, sender, receiver, text, statut, date];
+       for (var i = 0; i < 6; i++) {
+           var cell = row.insertCell(i);
+           cell.appendChild(document.createTextNode(smsOb[i]));
+       }
+   });
+
+    //________________________________________________________________ upReceiveSMS
+    socket.on('receiveSMS', function (user, sender, receiver, text, statut, date) {
+
+       var table = document.getElementById('histoRCV');
+       var row = table.insertRow(1);
+       smsOb = [user, sender, receiver, text, statut, date];
+       for (var i = 0; i < 6; i++) {
+           var cell = row.insertCell(i);
+           cell.appendChild(document.createTextNode(smsOb[i]));
+       }
+   });
+
+</script>
+
+<body onload="upModem()">
+
+    <div id="loader"></div>
+    <h1>WAX modem !!</h1>
+    <div id='statut'></div>
+    <hr>
+    <h2>Utilisateur</h2>
+    <input id="user" placeholder="Indiquez le user..." value="">
+    <input id="pw" type="password" placeholder="Indiquez le pw..." value="">
+    <button id="upUser" onclick="upUser()" >ENREGISTRER</button><br>
+    <input id="textOQP" placeholder="Indiquez le texte à renvoyer..." value="">
+    <input type="checkbox" id="occuper" value="">Ne pas déranger<br>
+    <input id="mailSMS" placeholder="Indiquez l'email..." value="">
+    <input type="checkbox" id="mailAR" value="">Accusé de réception mail<br>
+
+    <hr>
+    <h2>Modem</h2>
+    <select id="device" onchange="selectModem()" ></select><br>
+    <input id="sender" placeholder="Indiquez le NUMERO..." value="">
+    <button id="paramSMS" onclick="paramSMS()" >CONNECTER</button><br>
+    <input id="pop3" placeholder="Indiquez le POP3..." value="">
+    <input id="smtp" placeholder="Indiquez le SMTP..." value=""><br>
+    <input id="mailUser" placeholder="Indiquez le mail ID..." value="">
+    <input id="mailPw" type="password" placeholder="Indiquez le mail PW..." value="">
+
+    <hr>
+    <h2>Appel</h2>
+    <input id="code" placeholder="Indiquez le CODE..." value="">
+    <button id="upCredit" onclick="Session(document.getElementById('code').value)" >ENVOYER</button><br>
+
+    <hr>
+    <h2>Mot clef & Script</h2>
+    <input id="motClef" placeholder="Indiquez le mot clef...">
+    <button id="scriptSMS" onclick="scriptSMS()" >ENREGISTRER</button>
+    <button id="supScriptSMS" onclick="if(confirm('En etes vous certain ?')){supScriptSMS()}" >SUPPRIMER</button>
+    <select id="popScript" onchange="popScript()" ></select><br>
+    <textarea id="script" placeholder="Indiquez votre script..." rows="10" cols="100"></textarea><br>
+    <hr>
+
+    <h2>Envoi de SMS</h2>
+    <input id="receiver" placeholder="Indiquez le numero de SMS...">
+    <button id="sendSMS" onclick="sendSMS()" >ENVOYER</button><br>
+    <textarea id="text" placeholder="Indiquez votre texte (160 caracteres max)..." rows="2" cols="100" maxlength="160"></textarea>
+    <hr>
+
+    <h2>Emission de SMS</h2>
+    <table id ="histoSND"><tr><th>user</th><th>sender</th><th>receiver</th><th>text</th><th>statut</th><th>date</th></tr></table>
+    <hr>
+
+    <h2>Reception de SMS</h2>
+    <table id="histoRCV"><tr><th>user</th><th>sender</th><th>receiver</th><th>text</th><th>statut</th><th>date</th></tr></table>
+</body>

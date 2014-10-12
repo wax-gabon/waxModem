@@ -1,0 +1,38 @@
+{
+  "name": "waxModem",
+  "version": "1.0.0",
+  "description": "waxModem", 
+  "main": "HTML/index.html",
+  "node-main": "app.js",
+  "dependencies": {
+    "express": "4.9.7",
+    "connect": "3.2.0",
+    "socket.io": "1.1.0",
+    "mongodb" : "1.4.19",
+    "modem" :  "1.0.3",
+    "nodemailer" : "1.3.0"
+  },
+  "window": {
+    "title": "waxModem",
+    "width": 840,
+    "height": 600,
+    "toolbar": false,
+    "resizable":false,
+    "frame": true
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node app.js"
+  },
+  "repository": "",
+  "author": {
+    "name": "herve Delmas",
+    "email": "hdelmas@gmail.com"
+  },
+  "license": "BSD",
+  "private": true,
+  "readme": "waxModem",
+  "readmeFilename": "README.md",
+  "_id": "waxModem@1.0.0",
+  "_from": ""
+}

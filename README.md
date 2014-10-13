@@ -7,12 +7,12 @@ sms2web2mail en client/serveur sous Node.js, MongoDB, Socket.io ... smtp, pop3, 
 
 2_Installer MongoDB : http://docs.mongodb.org/manual/installation/
 
-3_Commandes shell de MongoDB et de waxModemServeur :
+3_Commandes shell pour lancer MongoDB et waxModemServeur :
 
     $ mongod
     $ node chemin/de/waxModem/app.js
 
-4_Ouvrir waxModemClient 1.0.0.app pour se connecter à waxModem
+4_Ouvrir waxModemClient 1.0.0.app (Node-WebKit) ou http://localhost:8181 (browser)
 
 5_Fonctionnalités :
 
@@ -24,7 +24,7 @@ sms2web2mail en client/serveur sous Node.js, MongoDB, Socket.io ... smtp, pop3, 
 
     - Appel numéro court (solde, rechargement de credit...)
 
-    - Execution de scripts à la reception sms/mail d'un mot clef
+    - Execution de scripts à la réception sms/mail d'un mot clef
 
     - Envoi de sms
 

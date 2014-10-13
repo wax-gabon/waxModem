@@ -161,6 +161,11 @@ document.getElementById('script').value=script;
    }
    socket.on('sendSMS', function (user, sender, receiver, text, statut, date) {
        document.getElementById('loader').style.display = 'none';
+
+    var x = document.getElementById("histoSND");
+    while (x.rows.length > 10) {
+        x.deleteRow(10);
+    }
        var table = document.getElementById('histoSND');
        var row = table.insertRow(1);
        smsOb = [user, sender, receiver, text, statut, date];
@@ -173,6 +178,11 @@ document.getElementById('script').value=script;
     //________________________________________________________________ upReceiveSMS
     socket.on('receiveSMS', function (user, sender, receiver, text, statut, date) {
 
+       
+    var x = document.getElementById("histoRCV");
+    while (x.rows.length > 10) {
+        x.deleteRow(10);
+    }
        var table = document.getElementById('histoRCV');
        var row = table.insertRow(1);
        smsOb = [user, sender, receiver, text, statut, date];

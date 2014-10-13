@@ -376,10 +376,13 @@ io.on('connection', function (socket)
             skip: x
         }).toArray(function (err, docs)
         {
+            if  (docs!=null){
             for (var i = docs.length - 1; i >= 0; i--)
             {
                 socket.emit('sendSMS', docs[i].user, docs[i].sender, docs[i].receiver, docs[i].text, docs[i].statut, docs[i].date);
+                socket.broadcast.emit('sendSMS', docs[i].user, docs[i].sender, docs[i].receiver, docs[i].text, docs[i].statut, docs[i].date);
             }
+        }
         });
     }
 
@@ -398,9 +401,12 @@ io.on('connection', function (socket)
             skip: x
         }).toArray(function (err, docs)
         {
+            if  (docs!=null){
             for (var i = docs.length - 1; i >= 0; i--)
             {
                 socket.emit('receiveSMS', docs[i].user, docs[i].sender, docs[i].receiver, docs[i].text, docs[i].statut, docs[i].date);
+                socket.broadcast.emit('receiveSMS', docs[i].user, docs[i].sender, docs[i].receiver, docs[i].text, docs[i].statut, docs[i].date);
+            }
             }
         });
     }
@@ -430,7 +436,7 @@ io.on('connection', function (socket)
                     {
                         receiver: receiver,
                         text: text,
-                        encoding: '7bit'
+                        encoding: '16bit'
                     }, function (err, sent_ids)
                     {
                         if (err)
@@ -441,7 +447,7 @@ io.on('connection', function (socket)
                         {
                             var date = new Date();
                             var statut = 'Envoyé';
-                            socket.emit('sendSMS', user, sender, receiver, text, statut, date);
+                            //socket.emit('sendSMS', user, sender, receiver, text, statut, date);
                             socket.emit('upSMS', '', '');
                             SMS.save(
                             {
@@ -454,7 +460,9 @@ io.on('connection', function (socket)
                                 date: date,
                                 statut: statut
                             }, function (err, saved)
-                            {});
+                            {
+                            upSendSMS(0,10);
+                            });
                         }
                     });
                // });
@@ -470,14 +478,15 @@ io.on('connection', function (socket)
         modem.open(device, function ()
         {
             socket.emit('paramSMS', 'Modem ' + device + ' connecté !!');
-
+            
+            
             //_________________________________________________________________ Sur OQP
             modem.on('ring', function (ring)
             {
                 modem.execute('AT+CHUP', function (err, response)
                 {
                     console.log('USSD Response:', response)
-                });
+                },true);
                 var receiver = ring;
                 USER.findOne(
                 {
@@ -492,7 +501,7 @@ io.on('connection', function (socket)
                         {
                             receiver: receiver,
                             text: textOQP,
-                            encoding: '7bit'
+                            encoding: '16bit'
                         }, function (err, sent_ids)
                         {
                             if (err)
@@ -518,7 +527,7 @@ io.on('connection', function (socket)
                                         var statut = 'Envoyé';
                                         var text = textOQP;
                                         var date = new Date();
-                                        socket.emit('sendSMS', user, sender, receiver, text, statut, date);
+                                        //socket.emit('sendSMS', user, sender, receiver, text, statut, date);
                                         SMS.save(
                                         {
                                             type: 'SND',
@@ -530,7 +539,8 @@ io.on('connection', function (socket)
                                             date: date,
                                             statut: statut
                                         }, function (err, saved)
-                                        {});
+                                        {
+                            			upSendSMS(0,10);});
                                     }
                                 });
                             }
@@ -538,7 +548,13 @@ io.on('connection', function (socket)
                     }
                 });
             });
-
+            
+           
+            
+       // });
+            
+       // modem.open(device, function ()
+       // {
             //_________________________________________________________________ Sur reception SMS
             modem.on('sms received', function (sms)
             {
@@ -556,12 +572,14 @@ io.on('connection', function (socket)
                     {
                         var receiver = item.sender;
                         //_____convertir text !! et filtrer sms invalide !!
+                        //   sms.indexes[0]
+                        
                         var user = 'MODEM';
                         var sender = sms.sender;
                         var text = sms.text;
                         var statut = 'Reçu';
                         var date = new Date();
-                        socket.emit('receiveSMS', user, sender, receiver, text, statut, date);
+                        //socket.emit('receiveSMS', user, sender, receiver, text, statut, date);
                         SMS.save(
                         {
                             type: 'RCV',
@@ -571,9 +589,10 @@ io.on('connection', function (socket)
                             text: text,
                             user: user,
                             date: date,
-                            statut: statut
+                            statut: statut,
                         }, function (err, saved)
-                        {});
+                        {
+                        upReceiveSMS(0, 10);});
 
                         //_________________________________________________________________ Sur Script
                         SCRIPT.findOne(
@@ -583,11 +602,7 @@ io.on('connection', function (socket)
                             }
                         }, function (err, item)
                         {
-                            if (item == null)
-                            {
-                                socket.emit('alerte', 'Erreur de script !!', '');
-                            }
-                            else
+                            if (item != null)
                             {
                                 var script = require('./HTML/scriptModem/' + item.motClef + '.js')(socket, SMS, PARAM, USER, SCRIPT);
                             }
@@ -639,7 +654,8 @@ io.on('connection', function (socket)
                                             date: date,
                                             statut: statut
                                         }, function (err, saved)
-                                        {});
+                                        {
+                        upReceiveSMS(0, 10);});
                                     }
                                 });
                             }
@@ -693,7 +709,7 @@ io.on('connection', function (socket)
                         {
                             receiver: receiver,
                             text: text,
-                            encoding: '7bit'
+                            encoding: '16bit'
                         }, function (err, sent_ids)
                         {
                             if (err)
@@ -705,7 +721,7 @@ io.on('connection', function (socket)
                                 var date = new Date();
                                 var statut = 'Envoyé';
                                 var user = 'MAIL';
-                                socket.emit('sendSMS', user, sender, receiver, text, statut, date);
+                                //socket.emit('sendSMS', user, sender, receiver, text, statut, date);
                                 SMS.save(
                                 {
                                     type: 'SND',
@@ -717,7 +733,8 @@ io.on('connection', function (socket)
                                     date: date,
                                     statut: statut
                                 }, function (err, saved)
-                                {});
+                                {
+                            	upSendSMS(0,10);});
                             }
                         });
                     //});

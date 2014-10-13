@@ -17,7 +17,9 @@ sms2web2mail en client/serveur sous Node.js, MongoDB, Socket.io ... smtp, pop3, 
     .Coller le contenu de waxModemClient dans ~/node-webkit.app/Contents/Resources/
     .ou lancer http://localhost:8181 (browser)
 
-5_Fonctionnalités :
+5_Connecter votre modem USB ou bluetooth (il sera automatiquement reconnu)
+
+6_Fonctionnalités :
 
     - Gestion des utilisateurs
         .Option raccrochage automatique avec retour mail

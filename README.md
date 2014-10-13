@@ -12,7 +12,10 @@ sms2web2mail en client/serveur sous Node.js, MongoDB, Socket.io ... smtp, pop3, 
     $ mongod
     $ node chemin/de/waxModem/app.js
 
-4_Ouvrir waxModemClient 1.0.0.app (Node-WebKit) ou http://localhost:8181 (browser)
+4_Installer Node-WebKit : https://github.com/rogerwang/node-webkit
+
+    .Coller le contenu de waxModemClient dans ~/node-webkit.app/Contents/Resources/
+    .ou lancer http://localhost:8181 (browser)
 
 5_Fonctionnalités :
 
